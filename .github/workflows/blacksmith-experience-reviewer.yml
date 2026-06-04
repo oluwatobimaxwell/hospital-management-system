@@ -1,0 +1,19 @@
+name: Blacksmith — Code Review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
+permissions:
+  contents: read
+  pull-requests: write
+  models: read
+jobs:
+  review:
+    if: github.event_name == 'pull_request' || (github.event_name == 'issue_comment' && github.event.issue.pull_request != null && github.event.comment.user.type != 'Bot' && contains(github.event.comment.body, '@blacksmith-dev'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: theblacksmithdev/blacksmith-exp-actions/reviewer@v1
+        with:
+          model: openai/gpt-4o-mini
+          min-severity: low
