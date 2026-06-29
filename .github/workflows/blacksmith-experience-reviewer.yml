@@ -8,6 +8,12 @@ permissions:
   contents: read
   pull-requests: write
   models: read
+  # Lets the reviewer action mint a short-lived OIDC token (via
+  # `core.getIDToken(...)`) that it sends to the Blacksmith backend
+  # instead of a stored PROJECT_API_TOKEN. Per-PR author identity
+  # comes from the JWT's `actor` claim, so multiple developers on
+  # the same repo no longer collide on a single shared secret slot.
+  id-token: write
 jobs:
   review:
     if: github.event_name == 'pull_request' || (github.event_name == 'issue_comment' && github.event.issue.pull_request != null && github.event.comment.user.type != 'Bot' && contains(github.event.comment.body, '@blacksmith-dev'))
@@ -17,3 +23,5 @@ jobs:
         with:
           model: openai/gpt-4o-mini
           min-severity: low
+          tracking-url: 'https://api.blacksmithexp.dev/api/github'
+          oidc-audience: 'https://api.blacksmithexp.dev'
